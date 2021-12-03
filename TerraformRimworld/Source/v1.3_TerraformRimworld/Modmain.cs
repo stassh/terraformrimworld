@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using HugsLib;
 using HugsLib.Settings;
 using RimWorld;
@@ -9,35 +9,6 @@ using Verse;
 namespace TerraformRimworld
 {
 	[DefOf]
-    public static class ResearchProjectDefOf
-    {
-        public static ResearchProjectDef BasicTerrain;
-        public static ResearchProjectDef WaterTerrain;
-        public static ResearchProjectDef LavaTerrain;
-        public static ResearchProjectDef RockyTerrain;
-        public static ResearchProjectDef ExoticTerrain;
-        public static ResearchProjectDef OtherTerrain;
-        public static ResearchProjectDef RockTerraforming;
-		public static ResearchProjectDef FloraTerraforming;
-		public static ResearchProjectDef MineralTerraforming;
-        public static ResearchProjectDef MountainsTerraforming;
-        public static ResearchProjectDef ReplicatorNanites;
-        public static ResearchProjectDef TerraEmiter;
-		public static ResearchProjectDef TectonicTerraforming;
-        public static ResearchProjectDef TectonicEmiter;
-		public static ResearchProjectDef FloraEmiter;
-        public static ResearchProjectDef RockEmiter;
-        public static ResearchProjectDef MineralEmiter;
-        public static ResearchProjectDef MountainsEmiter;
-        public static ResearchProjectDef WeatherEmiter;
-		public static ResearchProjectDef EmiterRange7;
-		public static ResearchProjectDef EmiterRange15;
-		public static ResearchProjectDef EmiterEfficiency2;                       
-        public static ResearchProjectDef EmiterEfficiency10;
-		public static ResearchProjectDef ReplicatorComplete;
-	}
-
-    [DefOf]
 	public static class DesignationCategoryDefOf
 	{
 		public static DesignationCategoryDef Terraform;
@@ -46,18 +17,18 @@ namespace TerraformRimworld
 	[DefOf]
 	public static class DesignatorDropdownGroupDefOf
 	{
-		public static DesignatorDropdownGroupDef Build_Roofs;
-		public static DesignatorDropdownGroupDef Build_Rocks;
+		public static DesignatorDropdownGroupDef Anomalies;
 		public static DesignatorDropdownGroupDef Build_Flora;
 		public static DesignatorDropdownGroupDef Build_ResRock;
+		public static DesignatorDropdownGroupDef Build_Rocks;
+		public static DesignatorDropdownGroupDef Build_Roofs;
 		public static DesignatorDropdownGroupDef Emiter;
 		public static DesignatorDropdownGroupDef ExoticTerrain;
 		public static DesignatorDropdownGroupDef LavaTerrain;
-        public static DesignatorDropdownGroupDef OtherTerrain;
-        public static DesignatorDropdownGroupDef TerrainRockyRough;
+		public static DesignatorDropdownGroupDef OtherTerrain;
+		public static DesignatorDropdownGroupDef TerrainRockyRough;
 		public static DesignatorDropdownGroupDef TerrainRockyRoughHewn;
 		public static DesignatorDropdownGroupDef TerrainRockySmooth;
-		public static DesignatorDropdownGroupDef Anomalies;
 	}
 
 	[DefOf]
@@ -66,131 +37,211 @@ namespace TerraformRimworld
 		public static JobDef RemoveThickRoof;
 	}
 
-
+	[DefOf]
+	public static class ResearchProjectDefOf
+	{
+		public static ResearchProjectDef BasicTerrain;
+		public static ResearchProjectDef EmiterEfficiency10;
+		public static ResearchProjectDef EmiterEfficiency2;
+		public static ResearchProjectDef EmiterRange15;
+		public static ResearchProjectDef EmiterRange7;
+		public static ResearchProjectDef ExoticTerrain;
+		public static ResearchProjectDef FloraEmiter;
+		public static ResearchProjectDef FloraTerraforming;
+		public static ResearchProjectDef LavaTerrain;
+		public static ResearchProjectDef MineralEmiter;
+		public static ResearchProjectDef MineralTerraforming;
+		public static ResearchProjectDef MountainsEmiter;
+		public static ResearchProjectDef MountainsTerraforming;
+		public static ResearchProjectDef OtherTerrain;
+		public static ResearchProjectDef ReplicatorComplete;
+		public static ResearchProjectDef ReplicatorNanites;
+		public static ResearchProjectDef RockEmiter;
+		public static ResearchProjectDef RockTerraforming;
+		public static ResearchProjectDef RockyTerrain;
+		public static ResearchProjectDef TectonicEmiter;
+		public static ResearchProjectDef TectonicTerraforming;
+		public static ResearchProjectDef TerraEmiter;
+		public static ResearchProjectDef WaterTerrain;
+		public static ResearchProjectDef WeatherEmiter;
+	}
 	[StaticConstructorOnStartup]
 	public class TRMod : ModBase
 	{
 		#region vars
-        #region mod options
-        public static bool OPTION_InstantConstruction;
-		public static bool OPTION_CostsEnabled;
-        public static bool OPTION_UseSilver;
-        public static int OPTION_CostAmount;
-        public static string OPTION_CostCustom;
-        public static bool OPTION_PlaceWithoutRestrictions;
-		public static bool OPTION_RockyScatterEnabled;
-		public static bool OPTION_UseAllTerrain;
-		public static int OPTION_WorkValue;
+
+		#region mod options
+
 		public static bool OPTION_AlternativeIcon;
-		public static int OPTION_EmiterTick;
-		public static float OPTION_EmiterBaseConsumption;
-		public static int OPTION_EmiterRandomDistance;
-		public static bool OPTION_VanillaLook;
-		public static int OPTION_TemperatureLimit;
-		public static bool OPTION_KeyedLanguange;
-		public static bool OPTION_ForceMinified;
-		public static bool OPTION_EmiterEnabled;
-
-        public static int OPTION_LavaSlowdown;
-
-		public static int OPTION_ChanceOfFire;
-		public static int OPTION_ChanceOfHeatGlow;
-		public static int OPTION_ChanceOfFireGlow;
-		public static int OPTION_ChanceOfLightningGlow;
-		public static int OPTION_ChanceOfDustPuff;
 		public static int OPTION_ChanceOfAirPuff;
+		public static int OPTION_ChanceOfDustPuff;
 		public static int OPTION_ChanceOfDustPuffthick;
+		public static int OPTION_ChanceOfFire;
+		public static int OPTION_ChanceOfFireGlow;
+		public static int OPTION_ChanceOfHeatGlow;
+		public static int OPTION_ChanceOfLightningGlow;
 		public static int OPTION_ChanceOfMetaPuff;
 		public static int OPTION_ChanceOfSmoke;
 		public static int OPTION_ChanceOfTornadoPuff;
-
-		public static float OPTION_MaxSizeFire;
-		public static float OPTION_MaxSizeHeatGlow;
-		public static float OPTION_MaxSizeFireGlow;
-		public static float OPTION_MaxSizeLightningGlow;
+		public static int OPTION_CostAmount;
+		public static string OPTION_CostCustom;
+		public static bool OPTION_CostsEnabled;
+		public static float OPTION_EmiterBaseConsumption;
+		public static bool OPTION_EmiterEnabled;
+		public static int OPTION_EmiterRandomDistance;
+		public static int OPTION_EmiterTick;
+		public static bool OPTION_ForceMinified;
+		public static bool OPTION_InstantConstruction;
+		public static bool OPTION_KeyedLanguange;
+		public static int OPTION_LavaSlowdown;
 		public static float OPTION_MaxSizeDustPuff;
 		public static float OPTION_MaxSizeDustPuffThick;
+		public static float OPTION_MaxSizeFire;
+		public static float OPTION_MaxSizeFireGlow;
+		public static float OPTION_MaxSizeHeatGlow;
+		public static float OPTION_MaxSizeLightningGlow;
 		public static float OPTION_MaxSizeSmoke;
 		public static float OPTION_MaxSizeTornadoPuff;
-		#endregion
+		public static bool OPTION_PlaceWithoutRestrictions;
+		public static bool OPTION_RockyScatterEnabled;
+		public static int OPTION_TemperatureLimit;
+		public static bool OPTION_UseAllTerrain;
+		public static bool OPTION_UseSilver;
+		public static bool OPTION_VanillaLook;
+		public static int OPTION_WorkValue;
+		#endregion mod options
 
 		#region holder
-		private Func<bool> PARAM_VanillaLook;
-		private Func<bool> PARAM_InstantConstruction;
-		private Func<bool> PARAM_CostEnabled;
-		private Func<int> PARAM_CostAmount;
-        private Func<string> PARAM_CostCustom;
-		private Func<int> PARAM_WorkValue;
-		private Func<bool> PARAM_PlaceWithoutRestrictions;
-		private Func<bool> PARAM_RockyScatterEnabled;
-		private Func<bool> PARAM_UseAllTerrain;
-		private Func<bool> PARAM_UseSilver;
+
 		private Func<bool> PARAM_AlternativeIcon;
-		private Func<int> PARAM_EmiterTick;
-		private Func<float> PARAM_EmiterBaseConsumption;
-		private Func<int> PARAM_EmiterRandomDistance;
-		private Func<int> PARAM_TemperatureLimit;
-		private Func<bool> PARAM_KeyedLanguange;
-		private Func<bool> PARAM_ForceMinified;
-		private Func<bool> PARAM_EmiterEnabled;
-
-		private Func<int> PARAM_LavaSlowdown;
-
-		private Func<int> PARAM_ChanceOfFire;
-		private Func<int> PARAM_ChanceOfHeatGlow;
-		private Func<int> PARAM_ChanceOfFireGlow;
-		private Func<int> PARAM_ChanceOfLightningGlow;
-		private Func<int> PARAM_ChanceOfDustPuff;
 		private Func<int> PARAM_ChanceOfAirPuff;
+		private Func<int> PARAM_ChanceOfDustPuff;
 		private Func<int> PARAM_ChanceOfDustPuffthick;
+		private Func<int> PARAM_ChanceOfFire;
+		private Func<int> PARAM_ChanceOfFireGlow;
+		private Func<int> PARAM_ChanceOfHeatGlow;
+		private Func<int> PARAM_ChanceOfLightningGlow;
 		private Func<int> PARAM_ChanceOfMetaPuff;
 		private Func<int> PARAM_ChanceOfSmoke;
 		private Func<int> PARAM_ChanceOfTornadoPuff;
-
-		private Func<float> PARAM_MaxSizeFire;
-		private Func<float> PARAM_MaxSizeHeatGlow;
-		private Func<float> PARAM_MaxSizeFireGlow;
-		private Func<float> PARAM_MaxSizeLightningGlow;
+		private Func<int> PARAM_CostAmount;
+		private Func<string> PARAM_CostCustom;
+		private Func<bool> PARAM_CostEnabled;
+		private Func<float> PARAM_EmiterBaseConsumption;
+		private Func<bool> PARAM_EmiterEnabled;
+		private Func<int> PARAM_EmiterRandomDistance;
+		private Func<int> PARAM_EmiterTick;
+		private Func<bool> PARAM_ForceMinified;
+		private Func<bool> PARAM_InstantConstruction;
+		private Func<bool> PARAM_KeyedLanguange;
+		private Func<int> PARAM_LavaSlowdown;
 		private Func<float> PARAM_MaxSizeDustPuff;
 		private Func<float> PARAM_MaxSizeDustPuffThick;
+		private Func<float> PARAM_MaxSizeFire;
+		private Func<float> PARAM_MaxSizeFireGlow;
+		private Func<float> PARAM_MaxSizeHeatGlow;
+		private Func<float> PARAM_MaxSizeLightningGlow;
 		private Func<float> PARAM_MaxSizeSmoke;
 		private Func<float> PARAM_MaxSizeTornadoPuff;
-        #endregion
+		private Func<bool> PARAM_PlaceWithoutRestrictions;
+		private Func<bool> PARAM_RockyScatterEnabled;
+		private Func<int> PARAM_TemperatureLimit;
+		private Func<bool> PARAM_UseAllTerrain;
+		private Func<bool> PARAM_UseSilver;
+		private Func<bool> PARAM_VanillaLook;
+		private Func<int> PARAM_WorkValue;
+		#endregion holder
 
-        #region own vars
-        public const string MODNAME = "TerraformRimworld";
+		#region own vars
+
 		public const string IDENTI = "1874652867";
-		public const string TABNAME = "Terraform";
+		public const string MODNAME = "TerraformRimworld";
 		public const string PACKID = "void.terraformrimworld";
-        public static bool isDebug;
-        public static bool isGerman { get { return (currentLanguage != null && currentLanguage.ToLower() == "german"); } }
+		public const string TABNAME = "Terraform";
 		public static string currentLanguage = null;
-		public static bool isCuproModActive = false;
-		public static bool isSZTerrainsModActive = false;
-		public static bool isSZStonesAndTerrainsModActive = false;
+		public static Dictionary<string, ThingDefCountClass> dicCustomCosts;
 		public static bool isAdvancedBiomesModActive = false;
-		public static System.Random zufallswert;
-		public static SoundDef SND_ROCK_NANITES;
+		public static bool isCuproModActive = false;
+		public static bool isDebug;
+		public static bool isSZStonesAndTerrainsModActive = false;
+		public static bool isSZTerrainsModActive = false;
 		public static SoundDef SND_FLORA_NANITES;
-        public static Dictionary<string, ThingDefCountClass> dicCustomCosts;		
-        #endregion
-        #endregion
+		public static SoundDef SND_ROCK_NANITES;
+		public static System.Random zufallswert;
+		public static bool isGerman { get { return (currentLanguage != null && currentLanguage.ToLower() == "german"); } }
+		#endregion own vars
 
-        public override string ModIdentifier
+		#endregion vars
+
+		private TRMod()
+		{
+			Harmony harmony = new Harmony("rimworld.mod.terraformrimworld");
+			harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
+			InitializeSettings();
+		}
+
+		public override string ModIdentifier
 		{
 			get { return MODNAME; }
 		}
 
-        #region settings
-        private bool HasSomethingChanged()
+		#region settings
+
+		public override void DefsLoaded()
+		{
+			if (ModIsActive)
+			{
+				LoadAndResolveModData();
+				//MessageTool.Show("TerraformRimworld 1.3 loaded");
+			}
+		}
+
+		public override void SettingsChanged()
+		{
+			if (ModIsActive)
+			{
+				if (HasSomethingChanged())
+				{
+					bool customCostsEmpty = (String.IsNullOrEmpty(OPTION_CostCustom) && String.IsNullOrEmpty(PARAM_CostCustom()));
+
+					if ((OPTION_CostsEnabled != PARAM_CostEnabled()) ||
+						(OPTION_CostAmount != PARAM_CostAmount()) ||
+						(!customCostsEmpty && (OPTION_CostCustom != PARAM_CostCustom())) ||
+						(OPTION_AlternativeIcon != PARAM_AlternativeIcon()) ||
+						(OPTION_EmiterTick != PARAM_EmiterTick()) ||
+						(OPTION_RockyScatterEnabled != PARAM_RockyScatterEnabled()) ||
+						(OPTION_UseAllTerrain != PARAM_UseAllTerrain()) ||
+						(OPTION_UseSilver != PARAM_UseSilver()) ||
+						(OPTION_ForceMinified != PARAM_ForceMinified()) ||
+						(OPTION_EmiterEnabled != PARAM_EmiterEnabled()) ||
+						(OPTION_KeyedLanguange != PARAM_KeyedLanguange()) ||
+						(OPTION_VanillaLook != PARAM_VanillaLook()))
+					{
+						Helper.ShowDialog("Some changes needs a def reload. To apply all changes the defs have to be reloaded. Do reset now?", true);
+					}
+					else
+					{
+						LoadAndResolveModData();
+					}
+				}
+			}
+		}
+
+		public override void WorldLoaded()
+		{
+			base.WorldLoaded();
+			ResearchAll();
+		}
+
+		private bool HasSomethingChanged()
 		{
 			bool somethingChanged = false;
 			bool cuproActive = (DefDatabase<ThingDef>.GetNamed("Claystone", false) != null);
 
-            if ((OPTION_CostsEnabled != PARAM_CostEnabled()) ||
+			if ((OPTION_CostsEnabled != PARAM_CostEnabled()) ||
 				(OPTION_CostAmount != PARAM_CostAmount()) ||
-                (OPTION_CostCustom != PARAM_CostCustom()) ||
-                (OPTION_WorkValue != PARAM_WorkValue()) ||
+				(OPTION_CostCustom != PARAM_CostCustom()) ||
+				(OPTION_WorkValue != PARAM_WorkValue()) ||
 				(OPTION_AlternativeIcon != PARAM_AlternativeIcon()) ||
 				(OPTION_EmiterTick != PARAM_EmiterTick()) ||
 				(OPTION_EmiterBaseConsumption != PARAM_EmiterBaseConsumption()) ||
@@ -214,188 +265,19 @@ namespace TerraformRimworld
 				somethingChanged = true;
 			return somethingChanged;
 		}
-
-		public override void WorldLoaded()
+		private void InitializeSettings()
 		{
-			base.WorldLoaded();
-			ResearchAll();						
-		}
+			#region defaults
 
-		private void ResearchAll()
-		{
-			if (TRMod.OPTION_VanillaLook)
-			{
-				foreach (ResearchProjectDef proj in DefDatabase<ResearchProjectDef>.AllDefs)
-				{
-					if (proj != null && proj.tab != null && proj.tab.defName == TABNAME)
-					{			
-						Find.ResearchManager.FinishProject(proj, false, null);
-					}
-				}
-			}			
-		}
-
-		public override void SettingsChanged()
-		{
-			if (ModIsActive)
-			{
-				if (HasSomethingChanged())
-				{
-                    bool customCostsEmpty = (String.IsNullOrEmpty(OPTION_CostCustom) && String.IsNullOrEmpty(PARAM_CostCustom()));
-
-                    if ((OPTION_CostsEnabled != PARAM_CostEnabled()) ||
-						(OPTION_CostAmount != PARAM_CostAmount()) ||
-                        (!customCostsEmpty && (OPTION_CostCustom != PARAM_CostCustom())) ||                        
-						(OPTION_AlternativeIcon != PARAM_AlternativeIcon()) ||
-						(OPTION_EmiterTick != PARAM_EmiterTick()) ||
-                        (OPTION_RockyScatterEnabled != PARAM_RockyScatterEnabled()) ||
-						(OPTION_UseAllTerrain != PARAM_UseAllTerrain()) ||
-						(OPTION_UseSilver != PARAM_UseSilver()) ||
-						(OPTION_ForceMinified != PARAM_ForceMinified()) ||
-						(OPTION_EmiterEnabled != PARAM_EmiterEnabled()) ||
-						(OPTION_KeyedLanguange != PARAM_KeyedLanguange()) ||
-						(OPTION_VanillaLook != PARAM_VanillaLook()))
-					{
-						Helper.ShowDialog("Some changes needs a def reload. To apply all changes the defs have to be reloaded. Do reset now?", true);
-					}
-					else
-					{						
-						LoadAndResolveModData();
-					}
-				}
-			}
-		}
-
-		public override void DefsLoaded()
-		{
-			if (ModIsActive)
-			{
-                LoadAndResolveModData();
-				//MessageTool.Show("TerraformRimworld 1.3 loaded");
-			}
-		}
-
-        #region validators
-        public static bool ValidWorkToBuild(string _value)
-		{
-			int iNumber = 100;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 100 || iNumber > 9999);
-		}
-
-		public static bool ValidCosts(string _value)
-		{
-			int iNumber = 1;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 1 || iNumber > 9999);
-		}
-
-		public static bool ValidTemperatureLimit(string _value)
-		{
-			int iNumber = 20;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 20 || iNumber > 9999);
-		}
-
-		public static bool ValidTick(string _value)
-		{
-			int iNumber = 30;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 30 || iNumber > 60000);
-		}
-
-		public static bool ValidLava(string _value)
-		{
-			int iNumber = 0;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 0 || iNumber > 10);
-		}
-
-		public static bool ValidMaxLava(string _value)
-		{
-			float fNumber = 0.0f;
-			float.TryParse(_value, out fNumber);
-			return !(fNumber < 0.0f || fNumber > 50.0f);
-		}
-
-		public static bool ValidLavaSlowdown(string _value)
-		{
-			int iNumber = 0;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 0 || iNumber > 300);
-		}
-
-		public static bool ValidFuelConsumption(string _value)
-		{
-			float fNumber = 0.0f;
-			float.TryParse(_value, out fNumber);
-			return !(fNumber < 0.0f || fNumber > 100.0f);
-		}
-
-		public static bool ValidEmiterRandomDistance(string _value)
-		{
-			int iNumber = 0;
-			int.TryParse(_value, out iNumber);
-			return !(iNumber < 0 || iNumber > 100);
-		}
-        #endregion
-
-        private void LoadSavedSettings()
-        {
-            OPTION_CostsEnabled = PARAM_CostEnabled();
-            OPTION_CostAmount = PARAM_CostAmount();
-			OPTION_CostCustom = PARAM_CostCustom();
-			OPTION_VanillaLook = PARAM_VanillaLook();
-            OPTION_InstantConstruction = PARAM_InstantConstruction();
-            OPTION_WorkValue = PARAM_WorkValue();
-			OPTION_AlternativeIcon = PARAM_AlternativeIcon();
-			OPTION_EmiterTick = PARAM_EmiterTick();
-			OPTION_EmiterBaseConsumption = PARAM_EmiterBaseConsumption();
-			OPTION_EmiterRandomDistance = PARAM_EmiterRandomDistance();
-            OPTION_PlaceWithoutRestrictions = PARAM_PlaceWithoutRestrictions();
-            OPTION_RockyScatterEnabled = PARAM_RockyScatterEnabled();
-            OPTION_UseAllTerrain = PARAM_UseAllTerrain();
-            OPTION_UseSilver = PARAM_UseSilver();
-			OPTION_TemperatureLimit = PARAM_TemperatureLimit();
-			OPTION_KeyedLanguange = PARAM_KeyedLanguange();
-			OPTION_ForceMinified = PARAM_ForceMinified();
-			OPTION_EmiterEnabled = PARAM_EmiterEnabled();
-
-            OPTION_LavaSlowdown = PARAM_LavaSlowdown();
-
-            OPTION_ChanceOfFire = PARAM_ChanceOfFire();
-            OPTION_ChanceOfHeatGlow = PARAM_ChanceOfHeatGlow();
-            OPTION_ChanceOfFireGlow = PARAM_ChanceOfFireGlow();
-            OPTION_ChanceOfLightningGlow = PARAM_ChanceOfLightningGlow();
-            OPTION_ChanceOfDustPuff = PARAM_ChanceOfDustPuff();
-            OPTION_ChanceOfAirPuff = PARAM_ChanceOfAirPuff();
-            OPTION_ChanceOfDustPuffthick = PARAM_ChanceOfDustPuffthick();
-            OPTION_ChanceOfMetaPuff = PARAM_ChanceOfMetaPuff();
-            OPTION_ChanceOfSmoke = PARAM_ChanceOfSmoke();
-            OPTION_ChanceOfTornadoPuff = PARAM_ChanceOfTornadoPuff();
-
-            OPTION_MaxSizeFire = PARAM_MaxSizeFire();
-            OPTION_MaxSizeHeatGlow = PARAM_MaxSizeHeatGlow();
-            OPTION_MaxSizeFireGlow = PARAM_MaxSizeFireGlow();
-            OPTION_MaxSizeLightningGlow = PARAM_MaxSizeLightningGlow();
-            OPTION_MaxSizeDustPuff = PARAM_MaxSizeDustPuff();
-            OPTION_MaxSizeDustPuffThick = PARAM_MaxSizeDustPuffThick();
-            OPTION_MaxSizeSmoke = PARAM_MaxSizeSmoke();
-            OPTION_MaxSizeTornadoPuff = PARAM_MaxSizeTornadoPuff();
-        }
-
-        private void InitializeSettings()
-		{
-            #region defaults
-            const bool DEF_InstantConstruction = false;
-            const bool DEF_CostsEnabled = true;
-            const bool DEF_UseSilver = false;
-            const int DEF_CostAmount = 1;
-            const string DEF_CostCustom = "";
-            const bool DEF_AllowPlacing = false;
-            const bool DEF_RemoveRockyScatter = false;
-            const bool DEF_GrabAllTerrain = false;
-            const int DEF_WorkValue = 1000;
+			const bool DEF_InstantConstruction = false;
+			const bool DEF_CostsEnabled = true;
+			const bool DEF_UseSilver = false;
+			const int DEF_CostAmount = 1;
+			const string DEF_CostCustom = "";
+			const bool DEF_AllowPlacing = false;
+			const bool DEF_RemoveRockyScatter = false;
+			const bool DEF_GrabAllTerrain = false;
+			const int DEF_WorkValue = 1000;
 			const bool DEF_AlternativeIcon = false;
 			const int DEF_EmiterTick = 60;
 			const float DEF_FuelConsumption = 1.0f;
@@ -406,7 +288,7 @@ namespace TerraformRimworld
 			const bool DEF_KeyedLanguage = false;
 			const bool DEF_EmiterEnabled = true;
 
-            const int DEF_LavaSlowdown = 200;            
+			const int DEF_LavaSlowdown = 200;
 			const int DEF_ChanceOfFire = 1;
 			const int DEF_ChanceOfHeatGlow = 7;
 			const int DEF_ChanceOfFireGlow = 7;
@@ -426,9 +308,10 @@ namespace TerraformRimworld
 			const float DEF_MaxSizeDustPuffThick = 7.0f;
 			const float DEF_MaxSizeSmoke = 7.0f;
 			const float DEF_MaxSizeTornadoPuff = 7.0f;
-            #endregion
 
-            SettingHandle.ValueIsValid isValidWorkValue = new SettingHandle.ValueIsValid(ValidWorkToBuild);
+			#endregion defaults
+
+			SettingHandle.ValueIsValid isValidWorkValue = new SettingHandle.ValueIsValid(ValidWorkToBuild);
 			SettingHandle.ValueIsValid isValidCostValue = new SettingHandle.ValueIsValid(ValidCosts);
 			SettingHandle.ValueIsValid isValidLavaValue = new SettingHandle.ValueIsValid(ValidLava);
 			SettingHandle.ValueIsValid isValidMaxLavaValue = new SettingHandle.ValueIsValid(ValidMaxLava);
@@ -445,13 +328,14 @@ namespace TerraformRimworld
 					settings.EntryName = MODNAME;
 
 					#region basic options
+
 					object handleZ = settings.GetHandle("P_VanillaLook", "[Mod] Vanilla Look", "Enabled=all terraforming research will be completed. Default=Disabled", DEF_VanillaLook);
 					PARAM_VanillaLook = () => (SettingHandle<bool>)handleZ;
 
 					object handleY = settings.GetHandle("P_EmiterEnabled", "[Emiter] enabled", "Enabled=you can build emiter, Disabled=emiter will be hidden. Default=Enabled", DEF_EmiterEnabled);
 					PARAM_EmiterEnabled = () => (SettingHandle<bool>)handleY;
 
-                    object handleX = settings.GetHandle("P_InstantConstruction", "[Instant] construction", "Enabled=play like in god mode - construction will be done instantly. Disabled=same as vanilla. Default=Disabled", DEF_InstantConstruction);
+					object handleX = settings.GetHandle("P_InstantConstruction", "[Instant] construction", "Enabled=play like in god mode - construction will be done instantly. Disabled=same as vanilla. Default=Disabled", DEF_InstantConstruction);
 					PARAM_InstantConstruction = () => (SettingHandle<bool>)handleX;
 
 					object handle3 = settings.GetHandle("P_AllowParameter", "[Placing] without restrictions", "Enabled=no terrain check. Disabled=terrain will be checked for suitable placing. Default=Enabled", DEF_AllowPlacing);
@@ -465,15 +349,15 @@ namespace TerraformRimworld
 
 					object handle = settings.GetHandle("P_CostParameter", "[Costs] for terraforming", "Enabled=terraforming will cost some resources. Disabled=terraform for free. Default=Enabled", DEF_CostsEnabled);
 					PARAM_CostEnabled = () => (SettingHandle<bool>)handle;
-					
+
 					object handle25 = settings.GetHandle("P_UseSilverParameter", "[Costs] silver instead of wood", "Enabled=terraforming of standard tiles cost some silver. Disabled=terraforming of standard tiles cost some wood. Default=Disabled", DEF_UseSilver);
 					PARAM_UseSilver = () => (SettingHandle<bool>)handle25;
 
 					object handle24 = settings.GetHandle("P_CostValue", "[Costs] value", "Set the amount of wood or silver [1-9999] needed to terraform a terrain tile. Default=1", DEF_CostAmount, ValidCosts);
 					PARAM_CostAmount = () => (SettingHandle<int>)handle24;
 
-                    object handle23 = settings.GetHandle("P_CostCustom", "[Costs] custom", "Set custom terrain, rock costs. Syntax: TerrainNameA|CostName(Value);TerrainNameB|CostName(Value);... Example: Soil|Steel(4); Water|None(0); Granite|Chemfuel(1);", DEF_CostCustom);
-                    PARAM_CostCustom = () => (SettingHandle<string>)handle23;
+					object handle23 = settings.GetHandle("P_CostCustom", "[Costs] custom", "Set custom terrain, rock costs. Syntax: TerrainNameA|CostName(Value);TerrainNameB|CostName(Value);... Example: Soil|Steel(4); Water|None(0); Granite|Chemfuel(1);", DEF_CostCustom);
+					PARAM_CostCustom = () => (SettingHandle<string>)handle23;
 
 					object handle2 = settings.GetHandle<int>("P_WorkParameter", "[Work] to build", "Set the amount of work [100-9999] for terraforming. The value is based on FPS. So a value of 60 means for unskilled 1 second, 120 means 2 seconds, etc. Default=1000", DEF_WorkValue, ValidWorkToBuild);
 					PARAM_WorkValue = () => (SettingHandle<int>)handle2;
@@ -485,10 +369,10 @@ namespace TerraformRimworld
 					PARAM_EmiterTick = () => (SettingHandle<int>)handle27;
 
 					object handle22 = settings.GetHandle<int>("P_EmiterRandomDistance", "[Emiter] search distance", "Search distance for nearest free tile around the emiter [0-100]. When no valid tile found, tiles will be selected randomly. Reducing this distance, will force to find more random, instead of near tiles. Default=30", DEF_EmiterRandomDistance, ValidEmiterRandomDistance);
-					PARAM_EmiterRandomDistance = () => (SettingHandle<int>)handle22;				
+					PARAM_EmiterRandomDistance = () => (SettingHandle<int>)handle22;
 
 					object handle29 = settings.GetHandle<float>("P_EmiterBaseConsumption", "[Emiter] base fuel consumption", "Set base fuel consumption per tick [0.0-100.0]. Default=1.0", DEF_FuelConsumption, ValidFuelConsumption);
-					PARAM_EmiterBaseConsumption = () => (SettingHandle<float>)handle29;																								
+					PARAM_EmiterBaseConsumption = () => (SettingHandle<float>)handle29;
 
 					object handle28 = settings.GetHandle<bool>("P_AlternativeIcon", "[Emiter] use alternative icon", "Enabled=ui icons will use alternative icons, when available. Default=Disabled", DEF_AlternativeIcon);
 					PARAM_AlternativeIcon = () => (SettingHandle<bool>)handle28;
@@ -498,10 +382,12 @@ namespace TerraformRimworld
 
 					object handle34 = settings.GetHandle<bool>("P_KeyedLanguage", "[Mod] use keyed language", "Enabled=text will be used from language files. Default=Disabled", DEF_KeyedLanguage);
 					PARAM_KeyedLanguange = () => (SettingHandle<bool>)handle34;
-                    #endregion
 
-                    #region lava options
-                    object handle40 = settings.GetHandle("P_LavaSlowdown", "[Lava] slowdown", "[0-300] 300=impassable, 0=no slowdown. Default=200", DEF_LavaSlowdown, ValidLavaSlowdown);
+					#endregion basic options
+
+					#region lava options
+
+					object handle40 = settings.GetHandle("P_LavaSlowdown", "[Lava] slowdown", "[0-300] 300=impassable, 0=no slowdown. Default=200", DEF_LavaSlowdown, ValidLavaSlowdown);
 					PARAM_LavaSlowdown = () => (SettingHandle<int>)handle40;
 
 					object handle50 = settings.GetHandle("P_chanceOfFire", "[Lava] chance of fire", "[0-10] Default=1", DEF_ChanceOfFire, ValidLava);
@@ -534,7 +420,6 @@ namespace TerraformRimworld
 					object handle59 = settings.GetHandle("P_chanceOfTornadoPuff", "[Lava] chance of tornado puff", "[0-10] Default=2", DEF_ChanceOfTornadoPuff, ValidLava);
 					PARAM_ChanceOfTornadoPuff = () => (SettingHandle<int>)handle59;
 
-
 					object handle60 = settings.GetHandle("P_maxSizeFire", "[Lava] max size of fire", "[0.0-50.0] Default=1.25", DEF_MaxSizeFire, ValidMaxLava);
 					PARAM_MaxSizeFire = () => (SettingHandle<float>)handle60;
 
@@ -558,20 +443,22 @@ namespace TerraformRimworld
 
 					object handle67 = settings.GetHandle("P_maxSizeTornadoPuff", "[Lava] max size of tornado puff", "[0.0-50.0] Default=25.0", DEF_MaxSizeTornadoPuff, ValidMaxLava);
 					PARAM_MaxSizeTornadoPuff = () => (SettingHandle<float>)handle67;
-                    #endregion
 
-                }))();
+					#endregion lava options
+				}))();
 				return;
 			}
 			catch (TypeLoadException)
 			{
 			}
+
 			#region reset to default
+
 			PARAM_VanillaLook = () => DEF_VanillaLook;
-            PARAM_InstantConstruction = () => DEF_InstantConstruction;
+			PARAM_InstantConstruction = () => DEF_InstantConstruction;
 			PARAM_CostEnabled = () => DEF_CostsEnabled;
 			PARAM_CostAmount = () => DEF_CostAmount;
-            PARAM_CostCustom = () => DEF_CostCustom;
+			PARAM_CostCustom = () => DEF_CostCustom;
 			PARAM_WorkValue = () => DEF_WorkValue;
 			PARAM_AlternativeIcon = () => DEF_AlternativeIcon;
 			PARAM_EmiterTick = () => DEF_EmiterTick;
@@ -599,7 +486,7 @@ namespace TerraformRimworld
 			PARAM_ChanceOfSmoke = () => DEF_ChanceOfSmoke;
 			PARAM_ChanceOfTornadoPuff = () => DEF_ChanceOfTornadoPuff;
 
-            PARAM_MaxSizeFire = () => DEF_MaxSizeFire;
+			PARAM_MaxSizeFire = () => DEF_MaxSizeFire;
 			PARAM_MaxSizeHeatGlow = () => DEF_MaxSizeHeatGlow;
 			PARAM_MaxSizeFireGlow = () => DEF_MaxSizeFireGlow;
 			PARAM_MaxSizeLightningGlow = () => DEF_MaxSizeLightningGlow;
@@ -607,37 +494,149 @@ namespace TerraformRimworld
 			PARAM_MaxSizeDustPuffThick = () => DEF_MaxSizeDustPuffThick;
 			PARAM_MaxSizeSmoke = () => DEF_MaxSizeSmoke;
 			PARAM_MaxSizeTornadoPuff = () => DEF_MaxSizeTornadoPuff;
-            #endregion
-        }
-        #endregion
 
-        TRMod()
-		{
-			Harmony harmony = new Harmony("rimworld.mod.terraformrimworld");
-			harmony.PatchAll(System.Reflection.Assembly.GetExecutingAssembly());
-			InitializeSettings();
+			#endregion reset to default
 		}
 
+		private void LoadSavedSettings()
+		{
+			OPTION_CostsEnabled = PARAM_CostEnabled();
+			OPTION_CostAmount = PARAM_CostAmount();
+			OPTION_CostCustom = PARAM_CostCustom();
+			OPTION_VanillaLook = PARAM_VanillaLook();
+			OPTION_InstantConstruction = PARAM_InstantConstruction();
+			OPTION_WorkValue = PARAM_WorkValue();
+			OPTION_AlternativeIcon = PARAM_AlternativeIcon();
+			OPTION_EmiterTick = PARAM_EmiterTick();
+			OPTION_EmiterBaseConsumption = PARAM_EmiterBaseConsumption();
+			OPTION_EmiterRandomDistance = PARAM_EmiterRandomDistance();
+			OPTION_PlaceWithoutRestrictions = PARAM_PlaceWithoutRestrictions();
+			OPTION_RockyScatterEnabled = PARAM_RockyScatterEnabled();
+			OPTION_UseAllTerrain = PARAM_UseAllTerrain();
+			OPTION_UseSilver = PARAM_UseSilver();
+			OPTION_TemperatureLimit = PARAM_TemperatureLimit();
+			OPTION_KeyedLanguange = PARAM_KeyedLanguange();
+			OPTION_ForceMinified = PARAM_ForceMinified();
+			OPTION_EmiterEnabled = PARAM_EmiterEnabled();
 
+			OPTION_LavaSlowdown = PARAM_LavaSlowdown();
 
+			OPTION_ChanceOfFire = PARAM_ChanceOfFire();
+			OPTION_ChanceOfHeatGlow = PARAM_ChanceOfHeatGlow();
+			OPTION_ChanceOfFireGlow = PARAM_ChanceOfFireGlow();
+			OPTION_ChanceOfLightningGlow = PARAM_ChanceOfLightningGlow();
+			OPTION_ChanceOfDustPuff = PARAM_ChanceOfDustPuff();
+			OPTION_ChanceOfAirPuff = PARAM_ChanceOfAirPuff();
+			OPTION_ChanceOfDustPuffthick = PARAM_ChanceOfDustPuffthick();
+			OPTION_ChanceOfMetaPuff = PARAM_ChanceOfMetaPuff();
+			OPTION_ChanceOfSmoke = PARAM_ChanceOfSmoke();
+			OPTION_ChanceOfTornadoPuff = PARAM_ChanceOfTornadoPuff();
+
+			OPTION_MaxSizeFire = PARAM_MaxSizeFire();
+			OPTION_MaxSizeHeatGlow = PARAM_MaxSizeHeatGlow();
+			OPTION_MaxSizeFireGlow = PARAM_MaxSizeFireGlow();
+			OPTION_MaxSizeLightningGlow = PARAM_MaxSizeLightningGlow();
+			OPTION_MaxSizeDustPuff = PARAM_MaxSizeDustPuff();
+			OPTION_MaxSizeDustPuffThick = PARAM_MaxSizeDustPuffThick();
+			OPTION_MaxSizeSmoke = PARAM_MaxSizeSmoke();
+			OPTION_MaxSizeTornadoPuff = PARAM_MaxSizeTornadoPuff();
+		}
+
+		private void ResearchAll()
+		{
+			if (TRMod.OPTION_VanillaLook)
+			{
+				foreach (ResearchProjectDef proj in DefDatabase<ResearchProjectDef>.AllDefs)
+				{
+					if (proj != null && proj.tab != null && proj.tab.defName == TABNAME)
+					{
+						Find.ResearchManager.FinishProject(proj, false, null);
+					}
+				}
+			}
+		}
+		#region validators
+
+		public static bool ValidCosts(string _value)
+		{
+			int iNumber = 1;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 1 || iNumber > 9999);
+		}
+
+		public static bool ValidEmiterRandomDistance(string _value)
+		{
+			int iNumber = 0;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 0 || iNumber > 100);
+		}
+
+		public static bool ValidFuelConsumption(string _value)
+		{
+			float fNumber = 0.0f;
+			float.TryParse(_value, out fNumber);
+			return !(fNumber < 0.0f || fNumber > 100.0f);
+		}
+
+		public static bool ValidLava(string _value)
+		{
+			int iNumber = 0;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 0 || iNumber > 10);
+		}
+
+		public static bool ValidLavaSlowdown(string _value)
+		{
+			int iNumber = 0;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 0 || iNumber > 300);
+		}
+
+		public static bool ValidMaxLava(string _value)
+		{
+			float fNumber = 0.0f;
+			float.TryParse(_value, out fNumber);
+			return !(fNumber < 0.0f || fNumber > 50.0f);
+		}
+
+		public static bool ValidTemperatureLimit(string _value)
+		{
+			int iNumber = 20;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 20 || iNumber > 9999);
+		}
+
+		public static bool ValidTick(string _value)
+		{
+			int iNumber = 30;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 30 || iNumber > 60000);
+		}
+
+		public static bool ValidWorkToBuild(string _value)
+		{
+			int iNumber = 100;
+			int.TryParse(_value, out iNumber);
+			return !(iNumber < 100 || iNumber > 9999);
+		}
+		#endregion validators
+		#endregion settings
 		private void LoadAndResolveModData()
 		{   // TODO see river defs => this can be manipulated!
-            isDebug = false;
-            currentLanguage = LanguageDatabase.activeLanguage.FriendlyNameEnglish.ToLower();
-            isCuproModActive = (DefDatabase<ThingDef>.GetNamed("Claystone", false) != null);
-            isSZTerrainsModActive = ModLister.HasActiveModWithName("SZ_Terrains");
-            isSZStonesAndTerrainsModActive = ModLister.HasActiveModWithName("SZ_StonesAndTerrains");
-            isAdvancedBiomesModActive = ModLister.HasActiveModWithName("Advanced Biomes");
-            zufallswert = new System.Random(50);
-            SND_ROCK_NANITES = DefDatabase<SoundDef>.GetNamed(_Sound.MeleeHit_Metal_Sharp, false);
+			isDebug = false;
+			currentLanguage = LanguageDatabase.activeLanguage.FriendlyNameEnglish.ToLower();
+			isCuproModActive = (DefDatabase<ThingDef>.GetNamed("Claystone", false) != null);
+			isSZTerrainsModActive = ModLister.HasActiveModWithName("SZ_Terrains");
+			isSZStonesAndTerrainsModActive = ModLister.HasActiveModWithName("SZ_StonesAndTerrains");
+			isAdvancedBiomesModActive = ModLister.HasActiveModWithName("Advanced Biomes");
+			zufallswert = new System.Random(50);
+			SND_ROCK_NANITES = DefDatabase<SoundDef>.GetNamed(_Sound.MeleeHit_Metal_Sharp, false);
 			SND_FLORA_NANITES = DefDatabase<SoundDef>.GetNamed(_Sound.MeleeHit_Wood, false);
 
+			LoadSavedSettings();
 
-            LoadSavedSettings();
-
-            Helper.ResolveCustomCosts();
+			Helper.ResolveCustomCosts();
 			Helper.CreateStormyAshRain();
-
 
 			ThingCategories.Init();
 
@@ -647,12 +646,12 @@ namespace TerraformRimworld
 			TectonicEmiterManager.Init();
 			FloraEmiterManager.Init();
 			MineralEmiterManager.Init();
-			RockEmiterManager.Init();			
+			RockEmiterManager.Init();
 			TerraEmiterManager.Init();
 			WeatherEmiterManager.Init();
-			
+
 			DesignatorDropdownGroupDefOf.Emiter.ResolveReferences();
-	     	DesignatorDropdownGroupDefOf.Emiter.PostLoad();
+			DesignatorDropdownGroupDefOf.Emiter.PostLoad();
 
 			ThingCategories.UpdateRootCategories();
 
