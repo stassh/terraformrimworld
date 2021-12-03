@@ -1,4 +1,4 @@
-﻿using HugsLib;
+using HugsLib;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -6,42 +6,34 @@ using Verse;
 
 namespace TerraformRimworld
 {
-	public class TectonicGeyser : Building
+	public static class TectonicEmiterManager
 	{
-		public override void SpawnSetup(Map map, bool respawningAfterLoad)
+		public static void Init()
 		{
-			base.SpawnSetup(map, respawningAfterLoad);
-
-			CreateGeyser(def, map, base.Position);
-
-			Destroy(DestroyMode.Vanish);
+			CreateTectonicEmiter();
 		}
 
-		public static void CreateGeyser(ThingDef def, Map map, IntVec3 loc)
+		private static void CreateTectonicEmiter()
 		{
-			ThingDef geyser = DefDatabase<ThingDef>.GetNamed("SteamGeyser", false);
-			if (geyser == null)
-				return;
+			Helper.CreateGeysirReplacer(ResearchProjectDefOf.TectonicTerraforming);
 
-			GenPlace.TryPlaceThing(ThingMaker.MakeThing(geyser), loc, map, ThingPlaceMode.Direct);
+			ThingDef emiter = DefDatabase<ThingDef>.GetNamed(_Emiter.TectonicEmiter, false);
+			if (emiter == null)
+			{
+				List<RecipeDef> recipes = new List<RecipeDef>();
+				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.TectonicCustomPulse, null, ResearchProjectDefOf.TectonicEmiter, false, "Custom Tectonic Pulse", "Custom Tectonic Pulsing", "Pulsing with configured mod options."));
+				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.TectonicAddRotation, null, ResearchProjectDefOf.TectonicEmiter, false, "Planet Rotation +", "Planet Rotation +", ""));
+				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.TectonicSubRotation, null, ResearchProjectDefOf.TectonicEmiter, false, "Planet Rotation -", "Planet Rotation -", ""));
+
+				Helper.CreateDefaultEmiter(_Emiter.TectonicEmiter, typeof(TectonicEmiter), _Emiter.TectonicEmiter, ResearchProjectDefOf.TectonicEmiter, recipes, 100, 0, "Tectonic-Emiter", "");
+			}
+			else
+				Helper.UpdateEmiter(_Emiter.TectonicEmiter);
 		}
 	}
 
 	public class PlaceWorker_Geyser : PlaceWorker
 	{
-		public override void PostPlace(Map map, BuildableDef def, IntVec3 loc, Rot4 rot)
-		{
-			//base.PostPlace(map, def, loc, rot);
-			if (TRMod.OPTION_InstantConstruction)
-			{
-				ThingDef tdef = DefDatabase<ThingDef>.GetNamed(def.defName);
-				TectonicGeyser.CreateGeyser(tdef, map, loc);
-
-				Designator_Cancel cancel = new Designator_Cancel();
-				cancel.DesignateSingleCell(loc);
-			}
-		}
-
 		public override AcceptanceReport AllowsPlacing(BuildableDef checkingDef, IntVec3 loc, Rot4 rot, Map map, Thing thingToIgnore = null, Thing thing = null)
 		{
 			var sourceTerrain = map.terrainGrid.TerrainAt(loc);
@@ -57,42 +49,58 @@ namespace TerraformRimworld
 			else
 				return true;
 		}
+
+		public override void PostPlace(Map map, BuildableDef def, IntVec3 loc, Rot4 rot)
+		{
+			//base.PostPlace(map, def, loc, rot);
+			if (TRMod.OPTION_InstantConstruction)
+			{
+				ThingDef tdef = DefDatabase<ThingDef>.GetNamed(def.defName);
+				TectonicGeyser.CreateGeyser(tdef, map, loc);
+
+				Designator_Cancel cancel = new Designator_Cancel();
+				cancel.DesignateSingleCell(loc);
+			}
+		}
 	}
 
 	public class TectonicEmiter : Building_WorkTable, IBillGiver, IBillGiverWithTickAction
 	{
 		#region vars
-		CompPowerTrader cpt;
-		int efficiency;
-		int maxRange;
-		Bill b;
-		bool hasDoneBill;
-		#endregion
+
+		private Bill b;
+		private CompPowerTrader cpt;
+		private int efficiency;
+		private bool hasDoneBill;
+		private int maxRange;
+		#endregion vars
 
 		#region constructor and overrides
+
 		public TectonicEmiter()
 		{
 		}
 
 		public override void SpawnSetup(Map map, bool respawningAfterLoad)
 		{
-			base.SpawnSetup(map, respawningAfterLoad);			
+			base.SpawnSetup(map, respawningAfterLoad);
 			HugsLibController.Instance.DistributedTicker.RegisterTickability(StartTectonicEmiter, TRMod.OPTION_EmiterTick, this);
 			cpt = this.GetComp<CompPowerTrader>();
-		}
-
-		public override void TickLong()
-		{
-			//base.TickLong();
 		}
 
 		public override void Tick()
 		{
 			//base.Tick();
 		}
-		#endregion
+
+		public override void TickLong()
+		{
+			//base.TickLong();
+		}
+		#endregion constructor and overrides
 
 		#region effect
+
 		private void DoEffect()
 		{
 			FleckMaker.ThrowHeatGlow(base.Position, base.Map, 1.0f);
@@ -102,15 +110,18 @@ namespace TerraformRimworld
 			b.suspended = !b.ShouldDoNow();
 			hasDoneBill = true;
 		}
-		#endregion
+
+		#endregion effect
 
 		#region recipe func
+
 		private void DoCustomTectonicPulse()
 		{
 			Helper.DoCustomTectonicPulse(base.Map);
 			DoEffect();
 		}
-		#endregion
+
+		#endregion recipe func
 
 		public void StartTectonicEmiter()
 		{
@@ -159,29 +170,24 @@ namespace TerraformRimworld
 		}
 	}
 
-	public static class TectonicEmiterManager
+	public class TectonicGeyser : Building
 	{
-		public static void Init()
+		public static void CreateGeyser(ThingDef def, Map map, IntVec3 loc)
 		{
-    		CreateTectonicEmiter();            
+			ThingDef geyser = DefDatabase<ThingDef>.GetNamed("SteamGeyser", false);
+			if (geyser == null)
+				return;
+
+			GenPlace.TryPlaceThing(ThingMaker.MakeThing(geyser), loc, map, ThingPlaceMode.Direct);
 		}
 
-		private static void CreateTectonicEmiter()
+		public override void SpawnSetup(Map map, bool respawningAfterLoad)
 		{
-			Helper.CreateGeysirReplacer(ResearchProjectDefOf.TectonicTerraforming);
+			base.SpawnSetup(map, respawningAfterLoad);
 
-			ThingDef emiter = DefDatabase<ThingDef>.GetNamed(_Emiter.TectonicEmiter, false);
-			if (emiter == null)
-			{
-				List<RecipeDef> recipes = new List<RecipeDef>();
-				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.TectonicCustomPulse, null, ResearchProjectDefOf.TectonicEmiter, false, "Custom Tectonic Pulse", "Custom Tectonic Pulsing", "Pulsing with configured mod options."));
-				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.TectonicAddRotation, null, ResearchProjectDefOf.TectonicEmiter, false, "Planet Rotation +", "Planet Rotation +", ""));
-				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.TectonicSubRotation, null, ResearchProjectDefOf.TectonicEmiter, false, "Planet Rotation -", "Planet Rotation -", ""));
+			CreateGeyser(def, map, base.Position);
 
-				Helper.CreateDefaultEmiter(_Emiter.TectonicEmiter, typeof(TectonicEmiter), _Emiter.TectonicEmiter, ResearchProjectDefOf.TectonicEmiter, recipes, 100, 0, "Tectonic-Emiter", "");				
-			}
-			else
-				Helper.UpdateEmiter(_Emiter.TectonicEmiter);
+			Destroy(DestroyMode.Vanish);
 		}
 	}
 }
