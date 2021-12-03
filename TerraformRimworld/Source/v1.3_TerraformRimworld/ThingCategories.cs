@@ -1,7 +1,6 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Verse;
@@ -10,7 +9,30 @@ namespace TerraformRimworld
 {
 	public static class ThingCategories
 	{
+		public static ThingCategoryDef Biome;
 		public static Dictionary<string, Color> dicColors;
+
+		public static ThingCategoryDef Farbe;
+
+		public static ThingCategoryDef Filth;
+
+		public static ThingCategoryDef Flora;
+
+		public static ThingCategoryDef FromFlora;
+
+		public static ThingCategoryDef FromMineral;
+
+		public static ThingCategoryDef FromRock;
+
+		public static ThingCategoryDef FromTerrain;
+
+		public static ThingCategoryDef Minerals;
+
+		public static ThingCategoryDef Rocks;
+
+		public static ThingCategoryDef Terraform;
+
+		public static ThingCategoryDef Terrain;
 
 		public enum Category
 		{
@@ -27,20 +49,155 @@ namespace TerraformRimworld
 			Filth,
 			Farbe
 		}
+		public static void AddToThingCategory(ThingCategoryDef category, ThingDef thing)
+		{
+			if (!category.childThingDefs.Contains(thing))
+				category.childThingDefs.Add(thing);
+		}
 
-		public static ThingCategoryDef Terraform;
-		public static ThingCategoryDef Terrain;
-		public static ThingCategoryDef Rocks;
-		public static ThingCategoryDef Minerals;
-		public static ThingCategoryDef Flora;
-		public static ThingCategoryDef Biome;
-		public static ThingCategoryDef Filth;
-		public static ThingCategoryDef FromTerrain;
-		public static ThingCategoryDef FromFlora;
-		public static ThingCategoryDef FromRock;
-		public static ThingCategoryDef FromMineral;
-		public static ThingCategoryDef Farbe;
-		
+		public static void CloneCategory(ThingCategoryDef sourceCategoryDef, ThingCategoryDef targetCategoryDef)
+		{
+			foreach (ThingDef t in sourceCategoryDef.childThingDefs)
+			{
+				ThingDef tfrom = new ThingDef();
+				tfrom.label = t.label;
+				tfrom.description = t.defName;
+				AddToThingCategory(targetCategoryDef, tfrom);
+			}
+			targetCategoryDef.ResolveReferences();
+			targetCategoryDef.PostLoad();
+		}
+
+		public static void CreateCategory(Category category)
+		{
+			switch (category)
+			{
+				case Category.Terraform:
+					Terraform = CreateThingCategory(_ThingCategory.Terraform, _ThingCategory.LBL_Terraform, ThingCategoryDefOf.Root);
+					break;
+
+				case Category.Terrain:
+					Terrain = CreateThingCategory(_ThingCategory.Terrain, _ThingCategory.LBL_Terrain, Terraform);
+					break;
+
+				case Category.Rocks:
+					Rocks = CreateThingCategory(_ThingCategory.Rocks, _ThingCategory.LBL_Rocks, Terraform);
+					break;
+
+				case Category.Minerals:
+					Minerals = CreateThingCategory(_ThingCategory.Minerals, _ThingCategory.LBL_Minerals, Terraform);
+					break;
+
+				case Category.Flora:
+					Flora = CreateThingCategory(_ThingCategory.Flora, _ThingCategory.LBL_Flora, Terraform);
+					break;
+
+				case Category.Biome:
+					Biome = CreateThingCategory(_ThingCategory.Biome, _ThingCategory.LBL_Biome, Terraform);
+					break;
+
+				case Category.Filth:
+					Filth = CreateThingCategory(_ThingCategory.Filth, _ThingCategory.LBL_Filth, Terraform);
+					break;
+
+				case Category.FromTerrain:
+					FromTerrain = CreateThingCategory(_ThingCategory.FromTerrain, _ThingCategory.LBL_FromTerrain, Terraform);
+					break;
+
+				case Category.FromFlora:
+					FromFlora = CreateThingCategory(_ThingCategory.FromFlora, _ThingCategory.LBL_FromFlora, Terraform);
+					break;
+
+				case Category.FromRock:
+					FromRock = CreateThingCategory(_ThingCategory.FromRock, _ThingCategory.LBL_FromRock, Terraform);
+					break;
+
+				case Category.FromMineral:
+					FromMineral = CreateThingCategory(_ThingCategory.FromMineral, _ThingCategory.LBL_FromMineral, Terraform);
+					break;
+
+				case Category.Farbe:
+					Farbe = CreateThingCategory(_ThingCategory.Farbe, _ThingCategory.LBL_Farbe, Terraform);
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		public static ThingCategoryDef CreateThingCategory(string defName, string label, ThingCategoryDef parent)
+		{
+			ThingCategoryDef tcd = DefDatabase<ThingCategoryDef>.GetNamed(defName, false);
+			if (tcd == null)
+			{
+				tcd = new ThingCategoryDef();
+				tcd.defName = defName;
+				tcd.label = label;
+				tcd.parent = parent;
+				tcd.parent.childCategories.Add(tcd);
+				tcd.ResolveReferences();
+				tcd.PostLoad();
+				DefDatabase<ThingCategoryDef>.Add(tcd);
+			}
+			return tcd;
+		}
+
+		public static void Init()
+		{
+			CreateCategory(Category.Terraform);
+			CreateCategory(Category.FromTerrain);
+			CreateCategory(Category.Terrain);
+			CreateCategory(Category.FromRock);
+			CreateCategory(Category.Rocks);
+			CreateCategory(Category.FromMineral);
+			CreateCategory(Category.Minerals);
+			CreateCategory(Category.FromFlora);
+			CreateCategory(Category.Flora);
+			CreateCategory(Category.Biome);
+			CreateCategory(Category.Filth);
+			CreateCategory(Category.Farbe);
+			PopulateCategoryBiome();
+			PopulateCategoryColor();
+		}
+
+		public static void PopulateCategoryBiome()
+		{
+			foreach (BiomeDef biome in DefDatabase<BiomeDef>.AllDefs)
+			{
+				ThingDef t = DefDatabase<ThingDef>.GetNamed(_Text.TBI_ + biome.defName, false);
+				if (t == null)
+				{
+					t = new ThingDef();
+					t.defName = _Text.TBI_ + biome.defName;
+					t.label = biome.label;
+
+					var l = (List<BiomePlantRecord>)biome.GetMemberValue("wildPlants");
+					List<ThingDef> lBiomePlants = new List<ThingDef>();
+					foreach (BiomePlantRecord r in l)
+						lBiomePlants.Add(r.plant);
+
+					t.description = biome.defName + "\nPlants:" + Helper.ListToString(lBiomePlants) + "\nTerrains:" + Helper.ListToString(biome.AllTerrains());
+					//ThingDef test = lBiomePlants.First();
+					//if (test != null)
+					//{
+					//}
+					t.graphicData = new GraphicData();
+					t.graphicData.color = Color.white;
+
+					MethodInfo shortHashGiver = typeof(ShortHashGiver).GetMethod(name: "GiveShortHash", bindingAttr: BindingFlags.NonPublic | BindingFlags.Static) ?? throw new ArgumentNullException();
+					Type type = typeof(ThingDef);
+					shortHashGiver.Invoke(obj: null, parameters: new object[] { t, type });
+
+					t.ResolveReferences();
+					t.PostLoad();
+					DefDatabase<ThingDef>.Add(t);
+				}
+				AddToThingCategory(Biome, t);
+			}
+			Biome.ResolveReferences();
+			Biome.PostLoad();
+		}
+
 		public static void PopulateCategoryColor()
 		{
 			dicColors = new Dictionary<string, Color>();
@@ -124,46 +281,6 @@ namespace TerraformRimworld
 			Farbe.ResolveReferences();
 			Farbe.PostLoad();
 		}
-
-		public static void PopulateCategoryBiome()
-		{
-			foreach (BiomeDef biome in DefDatabase<BiomeDef>.AllDefs)
-			{
-				ThingDef t = DefDatabase<ThingDef>.GetNamed(_Text.TBI_ + biome.defName, false);
-				if (t == null)
-				{
-					t = new ThingDef();
-					t.defName = _Text.TBI_ + biome.defName;
-					t.label = biome.label;
-
-					var l = (List<BiomePlantRecord>)biome.GetMemberValue("wildPlants");
-					List<ThingDef> lBiomePlants = new List<ThingDef>();
-					foreach (BiomePlantRecord r in l)
-						lBiomePlants.Add(r.plant);				
-
-					t.description = biome.defName + "\nPlants:" + Helper.ListToString(lBiomePlants) + "\nTerrains:" + Helper.ListToString(biome.AllTerrains());
-					//ThingDef test = lBiomePlants.First();
-					//if (test != null)
-					//{
-
-					//}
-					t.graphicData = new GraphicData();
-					t.graphicData.color = Color.white;
-
-					MethodInfo shortHashGiver = typeof(ShortHashGiver).GetMethod(name: "GiveShortHash", bindingAttr: BindingFlags.NonPublic | BindingFlags.Static) ?? throw new ArgumentNullException();
-					Type type = typeof(ThingDef);
-					shortHashGiver.Invoke(obj: null, parameters: new object[] { t, type });
-
-					t.ResolveReferences();
-					t.PostLoad();
-					DefDatabase<ThingDef>.Add(t);
-				}
-				AddToThingCategory(Biome, t);
-			}
-			Biome.ResolveReferences();
-			Biome.PostLoad();
-		}
-
 		public static void PopulateCategoryFTerrain(ThingCategoryDef baseCategory)
 		{
 			foreach (ThingDef tui in baseCategory.childThingDefs)
@@ -192,107 +309,6 @@ namespace TerraformRimworld
 			FromTerrain.ResolveReferences();
 			FromTerrain.PostLoad();
 		}
-
-		public static void CloneCategory(ThingCategoryDef sourceCategoryDef, ThingCategoryDef targetCategoryDef)
-		{
-			foreach (ThingDef t in sourceCategoryDef.childThingDefs)
-			{			
-				ThingDef tfrom = new ThingDef();
-				tfrom.label = t.label;
-				tfrom.description = t.defName;
-				AddToThingCategory(targetCategoryDef, tfrom);
-			}
-			targetCategoryDef.ResolveReferences();
-			targetCategoryDef.PostLoad();
-		}
-
-		public static void CreateCategory(Category category)
-		{
-			switch (category)
-			{
-				case Category.Terraform:
-					Terraform = CreateThingCategory(_ThingCategory.Terraform, _ThingCategory.LBL_Terraform, ThingCategoryDefOf.Root);
-					break;
-				case Category.Terrain:
-					Terrain = CreateThingCategory(_ThingCategory.Terrain, _ThingCategory.LBL_Terrain, Terraform);
-					break;
-				case Category.Rocks:
-					Rocks = CreateThingCategory(_ThingCategory.Rocks, _ThingCategory.LBL_Rocks, Terraform);
-					break;
-				case Category.Minerals:
-					Minerals = CreateThingCategory(_ThingCategory.Minerals, _ThingCategory.LBL_Minerals, Terraform);
-					break;
-				case Category.Flora:
-					Flora = CreateThingCategory(_ThingCategory.Flora, _ThingCategory.LBL_Flora, Terraform);
-					break;
-				case Category.Biome:
-					Biome = CreateThingCategory(_ThingCategory.Biome, _ThingCategory.LBL_Biome, Terraform);
-					break;
-				case Category.Filth:
-					Filth = CreateThingCategory(_ThingCategory.Filth, _ThingCategory.LBL_Filth, Terraform);
-					break;
-				case Category.FromTerrain:
-					FromTerrain = CreateThingCategory(_ThingCategory.FromTerrain, _ThingCategory.LBL_FromTerrain, Terraform);
-					break;
-				case Category.FromFlora:
-					FromFlora = CreateThingCategory(_ThingCategory.FromFlora, _ThingCategory.LBL_FromFlora, Terraform);
-					break;
-				case Category.FromRock:
-					FromRock = CreateThingCategory(_ThingCategory.FromRock, _ThingCategory.LBL_FromRock, Terraform);
-					break;
-				case Category.FromMineral:
-					FromMineral = CreateThingCategory(_ThingCategory.FromMineral, _ThingCategory.LBL_FromMineral, Terraform);
-					break;
-				case Category.Farbe:
-					Farbe = CreateThingCategory(_ThingCategory.Farbe, _ThingCategory.LBL_Farbe, Terraform);
-					break;
-				default:
-					break;
-			}			
-		}
-
-		public static void Init()
-		{
-			CreateCategory(Category.Terraform);
-			CreateCategory(Category.FromTerrain);
-			CreateCategory(Category.Terrain);
-			CreateCategory(Category.FromRock);
-			CreateCategory(Category.Rocks);
-			CreateCategory(Category.FromMineral);
-			CreateCategory(Category.Minerals);
-			CreateCategory(Category.FromFlora);
-			CreateCategory(Category.Flora);
-			CreateCategory(Category.Biome);
-			CreateCategory(Category.Filth);
-			CreateCategory(Category.Farbe);
-			PopulateCategoryBiome();
-			PopulateCategoryColor();
-
-		}
-
-		public static ThingCategoryDef CreateThingCategory(string defName, string label, ThingCategoryDef parent)
-		{
-			ThingCategoryDef tcd = DefDatabase<ThingCategoryDef>.GetNamed(defName, false);
-			if (tcd == null)
-			{
-				tcd = new ThingCategoryDef();
-				tcd.defName = defName;
-				tcd.label = label;
-				tcd.parent = parent;
-				tcd.parent.childCategories.Add(tcd);
-				tcd.ResolveReferences();
-				tcd.PostLoad();
-				DefDatabase<ThingCategoryDef>.Add(tcd);
-			}
-			return tcd;
-		}
-		
-		public static void AddToThingCategory(ThingCategoryDef category, ThingDef thing)
-		{
-			if (!category.childThingDefs.Contains(thing))
-				category.childThingDefs.Add(thing);
-		}
-
 		public static void UpdateRootCategories()
 		{
 			ThingCategoryDef.Named(_ThingCategory.BuildingMisc).ResolveReferences();
