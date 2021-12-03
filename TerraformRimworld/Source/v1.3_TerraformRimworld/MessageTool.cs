@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 
 namespace TerraformRimworld
@@ -10,11 +10,6 @@ namespace TerraformRimworld
 			Messages.Message(info, mt ?? MessageTypeDefOf.SilentInput, false);
 		}
 
-		public static void ShowInDebug(string info)
-		{
-			if (Prefs.DevMode)
-				Show(info);
-		}
 		public static void ShowDialog(string s, bool doRestart = false)
 		{
 			if (doRestart)
@@ -29,6 +24,12 @@ namespace TerraformRimworld
 			{
 				Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(s, null, false, null));
 			}
+		}
+
+		public static void ShowInDebug(string info)
+		{
+			if (Prefs.DevMode)
+				Show(info);
 		}
 	}
 }
