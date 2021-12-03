@@ -1,4 +1,4 @@
-﻿using HugsLib;
+using HugsLib;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -8,31 +8,43 @@ using Verse;
 
 namespace TerraformRimworld
 {
-	public class IncidentWorker_TempChange : IncidentWorker_MakeGameCondition
+	public static class WeatherEmiterManager
 	{
-		public IncidentWorker_TempChange()
+		public static void Init()
 		{
+			CreateWeatherEmiter();
 		}
 
-		protected override bool CanFireNowSub(IncidentParms parms)
+		private static void CreateWeatherEmiter()
 		{
-			if (!base.CanFireNowSub(parms))
+			ThingDef emiter = DefDatabase<ThingDef>.GetNamed(_Emiter.WeatherEmiter, false);
+			if (emiter == null)
 			{
-				return false;
+				List<RecipeDef> recipes = new List<RecipeDef>();
+				List<ThingCategoryDef> lcat = new List<ThingCategoryDef>();
+				//lcat.Add(ThingCategories.Rocks);
+				//lcat.Add(ThingCategories.Minerals);
+				lcat.Add(ThingCategories.Farbe);
+
+				foreach (WeatherDef weather in DefDatabase<WeatherDef>.AllDefs)
+					recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherChange + weather.defName, lcat, ResearchProjectDefOf.WeatherEmiter, true, weather.label, weather.label, weather.description));
+
+				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherAddTemp, null, ResearchProjectDefOf.WeatherEmiter, false, "Temperature +", "Increasing Biome Temperature", "Biome Temperature will be permanently increased."));
+				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherSubTemp, null, ResearchProjectDefOf.WeatherEmiter, false, "Temperature -", "Decreasing Biome Temperature", "Biome Temperature will be permanently decreased."));
+				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherRefog, null, ResearchProjectDefOf.WeatherEmiter, false, "Refog the map", "Refog the map", "Fogs all detected areas, as they were undetected."));
+
+				Helper.CreateDefaultEmiter(_Emiter.WeatherEmiter, typeof(WeatherEmiter), _Emiter.WeatherEmiter, ResearchProjectDefOf.WeatherEmiter, recipes, 1000, 0, "Weather-Emiter", "");
 			}
-			Map map = (Map)parms.target;
-			return map.mapTemperature.SeasonalTemp >= 20f;
+			else
+				Helper.UpdateEmiter(_Emiter.WeatherEmiter);
 		}
 	}
 
 	public class GameCondition_TempChange : GameCondition
 	{
-		private const int LerpTicks = 12000;
-
-		public float TempIncrement = 0.1f;
-
 		public float MaxTempOffset = 0.1f;
-
+		public float TempIncrement = 0.1f;
+		private const int LerpTicks = 12000;
 		public GameCondition_TempChange()
 		{
 			base.Permanent = true;
@@ -56,30 +68,46 @@ namespace TerraformRimworld
 		}
 	}
 
+	public class IncidentWorker_TempChange : IncidentWorker_MakeGameCondition
+	{
+		public IncidentWorker_TempChange()
+		{
+		}
 
-
-    public class WeatherEmiter : Building_WorkTable, IBillGiver, IBillGiverWithTickAction
-    {
+		protected override bool CanFireNowSub(IncidentParms parms)
+		{
+			if (!base.CanFireNowSub(parms))
+			{
+				return false;
+			}
+			Map map = (Map)parms.target;
+			return map.mapTemperature.SeasonalTemp >= 20f;
+		}
+	}
+	public class WeatherEmiter : Building_WorkTable, IBillGiver, IBillGiverWithTickAction
+	{
 		#region vars
-		CompPowerTrader cpt;
-		int efficiency;
-		int maxRange;
-		Bill b;
-		List<TerrainDef> lOfLava;
-		List<TerrainDef> lOfIce;
-		bool hasDoneBill;
-		#endregion
+
+		private Bill b;
+		private CompPowerTrader cpt;
+		private int efficiency;
+		private bool hasDoneBill;
+		private List<TerrainDef> lOfIce;
+		private List<TerrainDef> lOfLava;
+		private int maxRange;
+		#endregion vars
 
 		#region constructor and overrides
-		public WeatherEmiter()
-        {     
-        }
 
-        public override void SpawnSetup(Map map, bool respawningAfterLoad)
-        {
-            base.SpawnSetup(map, respawningAfterLoad);            
-            HugsLibController.Instance.DistributedTicker.RegisterTickability(StartWeatherEmiter, TRMod.OPTION_EmiterTick, this);
-            cpt = this.GetComp<CompPowerTrader>();
+		public WeatherEmiter()
+		{
+		}
+
+		public override void SpawnSetup(Map map, bool respawningAfterLoad)
+		{
+			base.SpawnSetup(map, respawningAfterLoad);
+			HugsLibController.Instance.DistributedTicker.RegisterTickability(StartWeatherEmiter, TRMod.OPTION_EmiterTick, this);
+			cpt = this.GetComp<CompPowerTrader>();
 
 			lOfLava = new List<TerrainDef>();
 			foreach (TerrainDef t in DefDatabase<TerrainDef>.AllDefs)
@@ -95,18 +123,19 @@ namespace TerraformRimworld
 			}
 		}
 
-        public override void TickLong()
-        {
-            //base.TickLong();
-        }
+		public override void Tick()
+		{
+			//base.Tick();
+		}
 
-        public override void Tick()
-        {
-            //base.Tick();
-        }
-		#endregion
+		public override void TickLong()
+		{
+			//base.TickLong();
+		}
+		#endregion constructor and overrides
 
 		#region effect
+
 		private void DoEffect()
 		{
 			FleckMaker.ThrowHeatGlow(base.Position, base.Map, 1.0f);
@@ -116,9 +145,11 @@ namespace TerraformRimworld
 			b.suspended = !b.ShouldDoNow();
 			hasDoneBill = true;
 		}
-		#endregion
+
+		#endregion effect
 
 		#region support func
+
 		private void ChangeWeatherColor(WeatherDef weather, Color col)
 		{
 			weather.skyColorsDay = new SkyColorSet();
@@ -150,7 +181,7 @@ namespace TerraformRimworld
 		}
 
 		private GameCondition_TempChange GetTemperatureCondition()
-		{			
+		{
 			foreach (GameCondition gc in base.Map.GameConditionManager.ActiveConditions)
 			{
 				if (gc.def.defName == "TempChange")
@@ -158,36 +189,32 @@ namespace TerraformRimworld
 			}
 			return null;
 		}
-		#endregion
+
+		#endregion support func
 
 		#region recipe func
+
 		private void ChangeWeather(List<ThingDef> lColors)
 		{
-			string defName = b.recipe.defName.Replace(_Recipe.WeatherChange, "");			
-			WeatherDef weather = DefDatabase<WeatherDef>.GetNamed(defName, false);			
+			string defName = b.recipe.defName.Replace(_Recipe.WeatherChange, "");
+			WeatherDef weather = DefDatabase<WeatherDef>.GetNamed(defName, false);
 			ThingDef choosen = Helper.GetRandomListElement(lColors);
 			if (weather != null && choosen != null)
-			{				
+			{
 				Color col = choosen.uiIconColor;
 				if (TRMod.isDebug)
 					Messages.Message("weather=" + weather.label + " color=" + col.r.ToString() + "," + col.g.ToString() + "," + col.b.ToString(), MessageTypeDefOf.SilentInput, false);
 
-				ChangeWeatherColor(weather, col);				
+				ChangeWeatherColor(weather, col);
 				base.Map.weatherManager.TransitionTo(weather);
-				base.Map.weatherManager.TransitionTo(weather);				
+				base.Map.weatherManager.TransitionTo(weather);
 				DoEffect();
-			}			
+			}
 		}
 
-		private void RefogMap()
-		{
-			FloodFillerFog.DebugRefogMap(base.Map);
-			DoEffect();
-		}
-	
 		private void DoTemperatureChange(bool isIncrease)
 		{
-			GameCondition_TempChange g = GetTemperatureCondition();	
+			GameCondition_TempChange g = GetTemperatureCondition();
 			if (g == null)
 			{
 				Helper.StartIncidentByName("TempChange", "Temperature started to change.", "Temperature Change");
@@ -204,7 +231,7 @@ namespace TerraformRimworld
 				//	base.Map.weatherManager.TransitionTo(weather);
 				//}
 				if (currentValue < -20.0f)
-				{					
+				{
 					base.Map.weatherManager.TransitionTo(WeatherDef.Named("SnowHard"));
 				}
 				else if (currentValue > 20.0f)
@@ -212,7 +239,7 @@ namespace TerraformRimworld
 					if (base.Map.weatherManager.curWeather != null && base.Map.weatherManager.curWeather.defName.Contains("Snow"))
 						base.Map.weatherManager.TransitionTo(WeatherDefOf.Clear);
 				}
-				
+
 				if (isIncrease && currentValue > TRMod.OPTION_TemperatureLimit)
 				{
 					int randchane = TRMod.zufallswert.Next(0, 10);
@@ -232,8 +259,8 @@ namespace TerraformRimworld
 					}
 
 					Helper.DoCustomTectonicPulse(base.Map);
-				}								
-				if (currentValue < ((-1)*TRMod.OPTION_TemperatureLimit))
+				}
+				if (currentValue < ((-1) * TRMod.OPTION_TemperatureLimit))
 				{
 					int count = ((int)currentValue + countLimit) * (-1);
 					for (int i = 0; i < count; i++)
@@ -249,27 +276,33 @@ namespace TerraformRimworld
 				if (!val.Contains("."))
 					val += ".0";
 
-                g.def.ClearCachedData();
+				g.def.ClearCachedData();
 				if (currentValue > 0)
 					g.def.label = "Temperature +" + val + "°C";
 				else
 					g.def.label = "Temperature " + val + "°C";
-                g.def.ResolveReferences();
-				FleckMaker.ThrowHeatGlow(base.Position, base.Map, currentValue / 40.0f);				
+				g.def.ResolveReferences();
+				FleckMaker.ThrowHeatGlow(base.Position, base.Map, currentValue / 40.0f);
 			}
 			DoEffect();
 		}
-		#endregion
+
+		private void RefogMap()
+		{
+			FloodFillerFog.DebugRefogMap(base.Map);
+			DoEffect();
+		}
+		#endregion recipe func
 
 		public void StartWeatherEmiter()
-        {
-            if (cpt.PowerOn)		
-                cpt.PowerOutput = -cpt.Props.basePowerConsumption;
-            else
-                return;
+		{
+			if (cpt.PowerOn)
+				cpt.PowerOutput = -cpt.Props.basePowerConsumption;
+			else
+				return;
 
-            try
-            {
+			try
+			{
 				efficiency = Helper.GetEfficiency();
 				maxRange = Helper.GetEmiterRange();
 				hasDoneBill = false;
@@ -288,59 +321,27 @@ namespace TerraformRimworld
 					}
 					else if (b.recipe.defName.StartsWith(_Recipe.WeatherRefog))
 					{
-						RefogMap();						
+						RefogMap();
 					}
 					else if (b.recipe.defName == _Recipe.WeatherAddTemp)
 					{
-						DoTemperatureChange(true);						
+						DoTemperatureChange(true);
 					}
 					else if (b.recipe.defName == _Recipe.WeatherSubTemp)
 					{
-						DoTemperatureChange(false);						
+						DoTemperatureChange(false);
 					}
-					
+
 					if (hasDoneBill)
 						break;
 				}
 			}
-            catch (Exception e)
-            {
-				BillStack.Clear();
-                if (TRMod.isDebug)
-                    Helper.ShowDialog(e.ToString());
-            }
-        }
-    }
-
-    public static class WeatherEmiterManager
-    {
-		public static void Init()
-		{
-			CreateWeatherEmiter();
-		}
-
-        private static void CreateWeatherEmiter()
-        {
-			ThingDef emiter = DefDatabase<ThingDef>.GetNamed(_Emiter.WeatherEmiter, false);
-			if (emiter == null)
+			catch (Exception e)
 			{
-				List<RecipeDef> recipes = new List<RecipeDef>();
-				List<ThingCategoryDef> lcat = new List<ThingCategoryDef>();
-				//lcat.Add(ThingCategories.Rocks);
-				//lcat.Add(ThingCategories.Minerals);
-				lcat.Add(ThingCategories.Farbe);
-
-				foreach (WeatherDef weather in DefDatabase<WeatherDef>.AllDefs)
-					recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherChange + weather.defName, lcat, ResearchProjectDefOf.WeatherEmiter, true, weather.label, weather.label, weather.description));
-
-				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherAddTemp, null, ResearchProjectDefOf.WeatherEmiter, false, "Temperature +", "Increasing Biome Temperature", "Biome Temperature will be permanently increased."));
-				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherSubTemp, null, ResearchProjectDefOf.WeatherEmiter, false, "Temperature -", "Decreasing Biome Temperature", "Biome Temperature will be permanently decreased."));
-				recipes.Add(Helper.CreateDefaultRecipe(_Recipe.WeatherRefog, null, ResearchProjectDefOf.WeatherEmiter, false, "Refog the map", "Refog the map", "Fogs all detected areas, as they were undetected."));
-
-				Helper.CreateDefaultEmiter(_Emiter.WeatherEmiter, typeof(WeatherEmiter), _Emiter.WeatherEmiter, ResearchProjectDefOf.WeatherEmiter, recipes, 1000, 0, "Weather-Emiter", "");
+				BillStack.Clear();
+				if (TRMod.isDebug)
+					Helper.ShowDialog(e.ToString());
 			}
-			else
-				Helper.UpdateEmiter(_Emiter.WeatherEmiter);
 		}
-    }
+	}
 }
